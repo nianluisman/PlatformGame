@@ -22,6 +22,7 @@ pub struct LevelDefinition {
     pub player_start: Vec3,
     pub platforms: Vec<PlatformDefinition>,
     pub spikes: Vec<SpikeDefinition>,
+    pub enemies: Vec<EnemyDefinition>,
 }
 
 pub struct PlatformDefinition {
@@ -30,6 +31,11 @@ pub struct PlatformDefinition {
 }
 
 pub struct SpikeDefinition {
+    pub position: Vec2,
+    pub size: Vec2,
+}
+
+pub struct EnemyDefinition {
     pub position: Vec2,
     pub size: Vec2,
 }
@@ -52,6 +58,7 @@ fn load_level_definition(mut commands: Commands) {
         player_start: Vec3::new(0.0, 0.0, 1.0),
         platforms: Vec::new(),
         spikes: Vec::new(),
+        enemies: Vec::new(),
     };
 
     for layer in map.layers() {
@@ -120,6 +127,20 @@ fn load_level_definition(mut commands: Commands) {
             _ => {}
         }
     }
+
+    // Place the first moving enemy on the long starting platform. More enemy
+    // definitions can be added here or loaded from a dedicated Tiled layer.
+    let enemy_size = Vec2::new(42.0, 58.0);
+    let mut enemy_position =
+        grid_cell_center(UVec2::new(20, 16), map_size, tile_size);
+
+    // Keep the enemy's bottom aligned with the platform.
+    enemy_position.y += (enemy_size.y - tile_size.y) * 0.5;
+
+    level.enemies.push(EnemyDefinition {
+        position: enemy_position,
+        size: enemy_size,
+    });
 
     commands.insert_resource(level);
 }
