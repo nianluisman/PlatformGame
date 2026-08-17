@@ -131,8 +131,7 @@ fn load_level_definition(mut commands: Commands) {
     // Place the first moving enemy on the long starting platform. More enemy
     // definitions can be added here or loaded from a dedicated Tiled layer.
     let enemy_size = Vec2::new(42.0, 58.0);
-    let mut enemy_position =
-        grid_cell_center(UVec2::new(20, 16), map_size, tile_size);
+    let mut enemy_position = grid_cell_center(UVec2::new(20, 16), map_size, tile_size);
 
     // Keep the enemy's bottom aligned with the platform.
     enemy_position.y += (enemy_size.y - tile_size.y) * 0.5;

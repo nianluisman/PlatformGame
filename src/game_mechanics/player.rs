@@ -1,8 +1,10 @@
 use bevy::prelude::*;
+use std::time::Duration;
 
 use crate::{
     levels::{LevelDefinition, Platform},
     render::PLAYER_COLOR,
+    utility::combat::{Attacker, Facing, Team},
 };
 
 const PLAYER_SIZE: Vec2 = Vec2::new(42.0, 58.0);
@@ -43,6 +45,14 @@ struct Grounded(bool);
 fn spawn_player(mut commands: Commands, level: Res<LevelDefinition>) {
     commands.spawn((
         Player,
+        Team::Player,
+        Facing(1.0),
+        Attacker::new(
+            Duration::from_millis(280),
+            Vec2::new(54.0, 46.0),
+            46.0,
+            Duration::from_millis(120),
+        ),
         PlayerSize(PLAYER_SIZE),
         Velocity::default(),
         Grounded::default(),
@@ -53,15 +63,18 @@ fn spawn_player(mut commands: Commands, level: Res<LevelDefinition>) {
 
 fn read_player_input(
     keyboard: Res<ButtonInput<KeyCode>>,
-    mut player: Query<(&mut Velocity, &Grounded), With<Player>>,
+    mut player: Query<(&mut Velocity, &Grounded, &mut Facing), With<Player>>,
 ) {
-    let Ok((mut velocity, grounded)) = player.single_mut() else {
+    let Ok((mut velocity, grounded, mut facing)) = player.single_mut() else {
         return;
     };
 
     let left = keyboard.pressed(KeyCode::KeyA) || keyboard.pressed(KeyCode::ArrowLeft);
     let right = keyboard.pressed(KeyCode::KeyD) || keyboard.pressed(KeyCode::ArrowRight);
     velocity.0.x = (right as i8 - left as i8) as f32 * MOVE_SPEED;
+    if velocity.0.x != 0.0 {
+        facing.0 = velocity.0.x.signum();
+    }
 
     let jump = keyboard.just_pressed(KeyCode::Space)
         || keyboard.just_pressed(KeyCode::KeyW)

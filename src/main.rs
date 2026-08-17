@@ -3,6 +3,7 @@ mod game;
 mod game_mechanics;
 mod levels;
 mod render;
+mod utility;
 
 use bevy::prelude::*;
 use game::GamePlugin;
